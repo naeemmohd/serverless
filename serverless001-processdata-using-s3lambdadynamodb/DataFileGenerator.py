@@ -5,7 +5,7 @@
 # pip install names
 import names
 import random
-monthNumbers = range(1,13)
+monthNumbers = range(1,26)
 for monthNumber in monthNumbers:
     with open('logs/salarydata-' + str(monthNumber) + '.csv', 'w') as outfile:
         numRows = range(1,101)
