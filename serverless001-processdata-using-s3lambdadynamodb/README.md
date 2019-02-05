@@ -67,7 +67,7 @@ for monthNumber in monthNumbers:
   - Lets put the name as - S3BucketProcessSalaryData2019
 - Please see the snapshot below
   ![Creating Bucket Snap 01](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/bucketsnap01.png)
-  ![Creating Bucket Snap 01](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/bucketsnap02.png)
+  ![Creating Bucket Snap 02](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/bucketsnap02.png)
 #### Lambda | Create a Lambda function with a trigger which gets invokes as a file is uplaoded to S3 
 - Create a Lambda function named - process_slary_data. 
   - Add a trigger to invoke on any item add to the above bucket
@@ -126,7 +126,7 @@ for monthNumber in monthNumbers:
     ```
 - Please see the snapshot below
   ![Creating Lambda Function Snap 01](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/lambdasnap01.png)
-  ![Creating Lambda Function Snap 02](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/imagess/lambdasnap02.png)
+  ![Creating Lambda Function Snap 02](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/lambdasnap02.png)
   ![Creating Lambda Function Snap 03](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/lambdasnap03.png)
 #### DynamoDB | Once the file is getting processed keep writing and updating the data in a table
 - Create a DynamoDB table 'EmployeeSalary' with Primary Key as 'EmpID' and Sort Key as 'EmpName'.
