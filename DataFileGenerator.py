@@ -7,7 +7,7 @@ import names
 import random
 monthNumbers = range(1,13)
 for monthNumber in monthNumbers:
-    with open('logs/salarydata-' + str(monthNumber) + '.csv', 'w') as outfile:
+    with open('logs/salarydata-' + str(monthNumber) + '.csv', 'w+') as outfile:
         numRows = range(1,101)
         outfile.write('EmpID,EmpName,EmpSalary\n')
         strRow = ''
@@ -19,4 +19,5 @@ for monthNumber in monthNumbers:
             outfile.write(strRow + '\n')
         outfile.close()
             
+
 
