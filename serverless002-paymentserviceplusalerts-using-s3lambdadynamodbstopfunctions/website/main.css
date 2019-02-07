@@ -1,0 +1,61 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #aaa;
+}
+
+.btn-primary {
+    color: white;
+    background-color: slategray;
+    border-color: #007bff;
+}
+
+.h2, h2 {
+    font-size: 1.5rem;
+}
+hr {
+  border-top: solid gray;
+}
+
+div #error-msg {
+  color: red;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+div #success-msg, #results-msg {
+  color: green;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.form-payments {
+  max-width: 500px;
+  padding: 12px;
+  margin: 0 auto;
+}
+.form-payments .form-payments-heading{
+  margin-bottom: 12px;
+}
+
+.form-payments .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 12px;
+}
+.form-payments .form-control:focus {
+  z-index: 2;
+}
+.form-payments input[type="InvoiceID"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-payments input[type="bottom"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
