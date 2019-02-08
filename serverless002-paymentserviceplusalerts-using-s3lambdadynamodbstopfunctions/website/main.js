@@ -1,5 +1,5 @@
 // Please enter the actual APIGATEWAYURL from the API Gateway Screen
-var APIGATEWAYURL = 'https://example1a2s3d.execute-api.us-east-1.amazonaws.com/dev/prometheon';
+var APIGATEWAYURL = 'https://p0gtmoln90.execute-api.us-east-1.amazonaws.com/prod';
 
 // setup divs for error, success and results
 var divError = document.getElementById('error-msg')
@@ -29,7 +29,7 @@ document.getElementById('getBalanceButton').addEventListener('click', function (
     event.preventDefault()
     clearMessageDivs()
     // Call the GET API service by Passing the InvoiceID
-    fetch(APIGATEWAYURL+'/id?InvoiceID='+getInvoiceID(), {
+    fetch(APIGATEWAYURL+ '/id?InvoiceID='+getInvoiceID(), {
         headers:{
             "Content-type": "application/json"
         },

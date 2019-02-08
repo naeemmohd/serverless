@@ -23,16 +23,14 @@ def handler(event, context):
             response = dynamodb.update_item(
                     TableName='PaymentBalance', 
                     Key={
-                        'InvoiceID': {'N': ddb_InvoiceId},
-                        'CustomerName': {'S': ddb_CustomerName},
+                        'InvoiceID': {'N': ddb_InvoiceId}
                     },
-                    UpdateExpression='ADD Balance :balance, IsProcessed :processed',
+                    UpdateExpression='set Balance=:balance, IsProcessed=:processed, CustomerName=:customerName',
                     ExpressionAttributeValues={
                         ':balance': {'N': ddb_Balance},
-                        ':processed': {'N': ddb_Processed}
+                        ':processed': {'N': ddb_Processed},
+                        ':customerName': {'S': str(ddb_CustomerName)}
                     },
                     ReturnValues="UPDATED_NEW"
             )
             print(response)
-			
-			
