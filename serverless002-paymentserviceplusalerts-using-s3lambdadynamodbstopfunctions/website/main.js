@@ -6,28 +6,63 @@ var divError = document.getElementById('error-msg')
 var successDiv = document.getElementById('success-msg')
 var resultsDiv = document.getElementById('results-msg')
 
+var invoiceID = document.getElementById('InvoiceID')
+var billingAmount = document.getElementById('BillingAmount')
+var billersName = document.getElementById('BillersName')
+var cardNumber = document.getElementById('CardNumber')
+var expiryDate = document.getElementById('ExpiryDate')
+var emailId = document.getElementById('EmailId')
+var phnNumber = document.getElementById('PhnNumber')
+
+var postPaymentButton = document.getElementById('postPaymentButton')
 
 // setup functions to get the field data
-function getInvoiceID() { return document.getElementById('InvoiceID').value }
-function getBillersName() { return document.getElementById('BillersName').value }
-function getCardNumber() { return document.getElementById('CardNumber').value }
-function getExpiryDate() { return document.getElementById('ExpiryDate').value }
-function getEmailId() { return document.getElementById('EmailId').value }
-function getPhnNumber() { return document.getElementById('PhnNumber').value }
+function getInvoiceID() { return invoiceID.value }
+function getBillingAmount() { return billingAmount.value }
+function getBillersName() { return billersName.value }
+function getCardNumber() { return cardNumber.value }
+function getExpiryDate() { return expiryDate.value }
+function getEmailId() { return emailId.value }
+function getPhnNumber() { return phnNumber.value }
 
-function clearMessageDivs() {
+function clearMessageDivs(state) {
     // clear the error, sucess and results div to refresh the content
     divError.textContent = '';
     resultsDiv.textContent = '';
     successDiv.textContent = '';
+    
+    invoiceID.disabled = false;
+    billersName.disabled = true;
+    billingAmount.disabled = true;
+    
+    if(state == 'get'){
+        cardNumber.disabled = false;
+        expiryDate.disabled = false;
+        emailId.disabled = false;
+        phnNumber.disabled = false;
+        postPaymentButton.disabled = false;
+    }
+    else{
+        cardNumber.disabled = true;
+        expiryDate.disabled = true;
+        emailId.disabled = true;
+        phnNumber.disabled = true;
+        postPaymentButton.disabled = true;
+    }
+    
+    
+
+    
 }
+
+clearMessageDivs('load');
 
 // Add the click listeners for both buttons button that make the API request
 
 document.getElementById('getBalanceButton').addEventListener('click', function (event) {
     // prevent page reloading by  clear message Divs
     event.preventDefault()
-    clearMessageDivs()
+    clearMessageDivs('get')
     // Call the GET API service by Passing the InvoiceID
     fetch(APIGATEWAYURL+ '/paymentbalance/id?InvoiceID='+getInvoiceID(), {
         headers:{
@@ -41,6 +76,9 @@ document.getElementById('getBalanceButton').addEventListener('click', function (
         console.log(data)
         successDiv.textContent = 'Please check your balance and make proper payment.';
         resultsDiv.textContent = JSON.stringify(data);
+        invoiceID.value = data.Item.InvoiceID;
+        billersName.value = data.Item.CustomerName;
+        billingAmount.value = data.Item.Balance;
     })
     .catch(function(err) {
         divError.textContent = 'Sorry, We could not pull your bill details:\n' + err.toString();
@@ -51,7 +89,7 @@ document.getElementById('getBalanceButton').addEventListener('click', function (
 document.getElementById('postPaymentButton').addEventListener('click', function (event) {
     // prevent page reloading by  clear message Divs
     event.preventDefault()
-    clearMessageDivs()    
+    clearMessageDivs('post')    
     // Prepare the appropriate HTTP request to the API with fetch
     // update uses the /prometheon/id endpoint and requires a JSON payload
     fetch(APIGATEWAYURL+'/id', {
