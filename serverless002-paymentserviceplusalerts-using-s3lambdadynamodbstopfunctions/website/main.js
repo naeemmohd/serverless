@@ -29,7 +29,7 @@ document.getElementById('getBalanceButton').addEventListener('click', function (
     event.preventDefault()
     clearMessageDivs()
     // Call the GET API service by Passing the InvoiceID
-    fetch(APIGATEWAYURL+ '/id?InvoiceID='+getInvoiceID(), {
+    fetch(APIGATEWAYURL+ '/paymentbalance/id?InvoiceID='+getInvoiceID(), {
         headers:{
             "Content-type": "application/json"
         },
