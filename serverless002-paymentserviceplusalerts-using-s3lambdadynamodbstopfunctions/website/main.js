@@ -1,5 +1,5 @@
-// Please enter the actual APIGATEWAYURL from the API Gateway Screen, the blow one is a test API URL
-var APIGATEWAYURL = 'https://paymentprocess.execute-api.us-east-1.amazonaws.com/prod';
+// Please enter the actual APIGATEWAYURL from the API Gateway Screen
+var APIGATEWAYURL = 'https://p0gtmoln90.execute-api.us-east-1.amazonaws.com/prod';
 
 // setup divs for error, success and results
 var divError = document.getElementById('error-msg')
@@ -79,7 +79,6 @@ document.getElementById('getBalanceButton').addEventListener('click', function (
     .then((resp) => resp.json()) 
     .then(function(data) {
         console.log(data)
-        // additional logic to keep the form disabled if the there is not balance due
         if(data.Item.Balance<=0){
             clearMessageDivs('postnobalancedue')   
         }

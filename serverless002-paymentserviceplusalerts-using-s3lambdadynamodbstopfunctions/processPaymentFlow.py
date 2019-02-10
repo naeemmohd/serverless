@@ -4,7 +4,7 @@ import json
 import decimal
 
 # PLease replace with an actual Step function ARN as this ARN is a test URL
-ARN_OF_STATEMACHINE = 'arn:aws:states:us-east-1:123456789012:stateMachine:processPaymentMachine'
+ARN_OF_STATEMACHINE = 'arn:aws:states:us-east-1:677236783664:stateMachine:processPaymentMachine'
 
 sfn = boto3.client('stepfunctions')
 
@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     data = json.loads(event['body'])
     data['WaitSeconds'] = int(data['WaitSeconds'])
     
-    # Validation Check, if any of the data is missing it will holld a false value in the tuple
+    # Validation Check
     validationCheck = []
     validationCheck.append('WaitSeconds' in data)
     validationCheck.append(type(data['WaitSeconds']) == int)
@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     elif data.get('Choices') == "text":
         validationCheck.append('PhnNumber' in data)
 
-    # Check for any FALSE value in  validationCheck
+    # Check for any errors in validation validationCheck
     if False in validationCheck:
         response = {
             "statusCode": 400,

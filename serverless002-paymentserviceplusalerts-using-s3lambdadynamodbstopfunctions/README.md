@@ -1,62 +1,52 @@
-# Processing Data using AWS S3, Lambda Functions and DynamoDB.
-### This article shows how to use there three AWS services - S3, Lambda and DynamaDB to process structured files.
-### The following steps would be needed to accomplish the objective:
-- First of all we will have salary data files for per month for a organisation containing Employee ID, Employee Name, Salary as the fields 
-- Next, we will upload this file to S3.
-- Next, this will fire Lambda trigger event which will process the uploaded file.
-- Next, once the data is proccesed it will be stored in the database.
+# Payment processor with work flow state machine using Data using AWS S3, Lambda Functions, Step Functions and DynamoDB.
+### This article shows how to use these AWS services - S3, Lambda Functions, Step Functions and DynamaDB to process a payment.
+### Objective:
+- For the Billling and Payment process, a file is placed/updated in S3 everyday for customers whose Bill is due/pending and
+- Next, this Bills Due file is processed by a Lambda Function to update the information in a DynamoDB table and
+- Next, on the Billings Website, a customer retrives his bill by entering his Invoice ID and makes a payment and
+- Next, the payment is processed and Balance is updated to zero and 
+- Finally, a text or email alert is sent to customer confirming his payment
 
 ### Lets tabulate the steps as below:
 Steps | Actions
 ------------ | -------------
-Prerequisite | Generate the data files for 12 months for 100 employees 
-S3 | Create a S3 bucket to upload files
-Lambda | Create a Lambda function with a trigger which gets invokes as a file is uplaoded to S3 
-DynamoDB | Once the file is getting processed keep writing and updating the data in a table
+Prerequisite | Generate the 'Bills Due' file for specific day 
+S3 | Create a S3 bucket and upload the 'Bills Due' file
+DynamoDB | Create a table to store 'Bills Due'
+Lambda Functions | Create functions to update DynamoDB database with 'Bills Due' info, email and text alert, process payment etc
+Step Function | Create a Step function to create a work flow which will process the payment and send email/text alert 
 
-#### Prerequisite - Generate the data files for 12 months for 100 employees 
-- Since we don't have data files with us, let's try to generate data files using a python sample code.
-- We would need some random names and random salary values to generate such a file.
-- Python ha these two libraries - names and random to genartes names and numbers. 
-- We will have to install and import these packages first:
-  ```
-  # **install pip and dependencies**
-  sudo apt-get install python-pip python-dev build-essential
-  # **install names package**
-  pip install names 
-  # **install random package**
-  pip install random 
-  ```
- - Here is the code for the file salary data generator file(DataFileGenerator.py):
-```
-# **import the names package**
-import names
-# **import the randoms package**
-import random
 
-# **As we need to generate 12 months data lets create the range  - range(1,13)**
-monthNumbers = range(1,13)
-# **Iterate through the month numbers**
-for monthNumber in monthNumbers:
-    # **Open/create salarydata files to write the salary data**
-    with open('logs/salarydata-' + str(monthNumber) + '.csv', 'w+') as outfile:
-        # **Number of rows in each file - 100**
-        numRows = range(1,101)
-        # **Write the first line as header
-        outfile.write('EmpID,EmpName,EmpSalary\n')
-        strRow = ''
-        # **Iterate thrrough the row numbers to generate the rows
-        for numRow in numRows:
-            # **EmpID as concatenated string as str(monthNumber) + str(numRow)**
-            # **EmpName as a random name using the names package - names.get_full_name(gender='male')**
-            # **EmpSalary as random salary value between 5555 to 7777 - random.randint(5555, 7777)**
-            # for even rows the name will be male else female
-            if numRow % 2 == 0:
-                strRow = str(monthNumber) + str(numRow) + ',' + names.get_full_name(gender='male') + ',' + str(random.randint(5555, 7777))
-            else:
-                strRow = str(monthNumber) + str(numRow) + ',' + names.get_full_name(gender='female') + ',' + str(random.randint(5555, 7777))
-            outfile.write(strRow + '\n')
-        outfile.close()
+#### Prerequisite - Generate the 'Bills Due' file for specific day  
+ - I am using an arbitrary logic to generate the file.
+ - Once generated, the file will look like below
+   ![Payment Balance CSV file](https://github.com/naeemmohd/serverless/blob/master/serverless001-processdata-using-s3lambdadynamodb/images/bucketsnap01.png)
+ - Here is the code for the file(PaymentBalanceGenerator.py):
+  ```
+  # Prerequisites: Please install the following before genarating the file.
+  # install pip and dependencies
+  # sudo apt-get install python-pip python-dev build-essential
+  # install names 
+  # pip install names
+  import names
+  import random
+  import os
+
+  dirName = 'logs';
+  if not os.path.exists(dirName):
+      os.mkdir(dirName)
+
+  filePath = dirName + '/paymentbalance.csv';
+  with open(filePath, 'w+') as outfile:
+      numRows = range(1,1001)
+      outfile.write('InvoiceID,CustomerName,Balance,IsProcessed\n')
+      strRow = ''
+      for numRow in numRows:
+          strRow = str(numRow) + ',' + names.get_full_name(gender='female') + ',' + str(random.randint(500, 900)) + ',0'
+          outfile.write(strRow + '\n')
+      outfile.close()
+
+  print('Please check the file at path:' + os.path.abspath(filePath));            
   ```
 - Now save and execute the above python file(DataFileGnerator.py):
   ```
