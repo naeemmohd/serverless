@@ -1,0 +1,89 @@
+{
+  "Comment": "This state machine processes a payment and sends text/email alerts.",
+  "StartAt": "Wait",
+  "States": {
+    "Wait": {
+      "Type": "Wait",
+      "SecondsPath": "$.WaitSeconds",
+      "Next": "ProcessPayment"
+    },
+    
+    "ProcessPayment": {
+      "Type" : "Task",
+      "Resource": "ARN_OF_POSTPAYMENT_LAMBDA_FUNCTION",
+      "Next": "ChoiceAlertState"
+    },
+    
+    "ChoiceAlertState": {
+      "Type" : "Choice",
+      "Choices": [
+        {
+          "Variable": "$.Choices",
+          "StringEquals": "email",
+          "Next": "ProcessEmails"
+        },
+        {
+          "Variable": "$.Choices",
+          "StringEquals": "text",
+          "Next": "ProcessTexts"
+        },
+        {
+          "Variable": "$.Choices",
+          "StringEquals": "both",
+          "Next": "ProcessEmailsandTextsBoth"
+        }
+      ],
+      "Default": "DefaultState"
+    },
+
+    "ProcessEmails": {
+      "Type" : "Task",
+      "Resource": "ARN_OF_PROCESSEMAILS_LAMBDA_FUNCTION",
+      "Next": "FinalState"
+    },
+
+    "ProcessTexts": {
+      "Type" : "Task",
+      "Resource": "ARN_OF_PROCESSTEXTS_LAMBDA_FUNCTION",
+      "Next": "FinalState"
+    },
+    
+    "ProcessEmailsandTextsBoth": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "ProcessEmailsParallel",
+          "States": {
+            "ProcessEmailsParallel": {
+              "Type" : "Task",
+              "Resource": "ARN_OF_PROCESSEMAILS_LAMBDA_FUNCTION",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ProcessTextsParallel",
+          "States": {
+            "ProcessTextsParallel": {
+              "Type" : "Task",
+              "Resource": "ARN_OF_PROCESSTEXTS_LAMBDA_FUNCTION",
+              "End": true
+            }
+          }
+        }
+      ],
+      "Next": "FinalState"
+    },
+    
+    "DefaultState": {
+      "Type": "Fail",
+      "Error": "DefaultStateError",
+      "Cause": "Error!"
+    },
+
+    "FinalState": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

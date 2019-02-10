@@ -1,5 +1,5 @@
-// Please enter the actual APIGATEWAYURL from the API Gateway Screen
-var APIGATEWAYURL = 'https://p0gtmoln90.execute-api.us-east-1.amazonaws.com/prod';
+// Please enter the actual APIGATEWAYURL from the API Gateway Screen, the blow one is a test API URL
+var APIGATEWAYURL = 'https://paymentprocess.execute-api.us-east-1.amazonaws.com/prod';
 
 // setup divs for error, success and results
 var divError = document.getElementById('error-msg')
@@ -13,6 +13,8 @@ var cardNumber = document.getElementById('CardNumber')
 var expiryDate = document.getElementById('ExpiryDate')
 var emailId = document.getElementById('EmailId')
 var phnNumber = document.getElementById('PhnNumber')
+var emailChoice = document.getElementById('EmailChoice')
+var textChoice = document.getElementById('TextChoice')
 
 var postPaymentButton = document.getElementById('postPaymentButton')
 
@@ -24,6 +26,8 @@ function getCardNumber() { return cardNumber.value }
 function getExpiryDate() { return expiryDate.value }
 function getEmailId() { return emailId.value }
 function getPhnNumber() { return phnNumber.value }
+function getEmailChoice() { return emailChoice.value }
+function getTextChoice() { return textChoice.value }
 
 function clearMessageDivs(state) {
     // clear the error, sucess and results div to refresh the content
@@ -40,6 +44,8 @@ function clearMessageDivs(state) {
         expiryDate.disabled = false;
         emailId.disabled = false;
         phnNumber.disabled = false;
+        emailChoice.disabled = false;
+        textChoice.disabled = false;
         postPaymentButton.disabled = false;
     }
     else{
@@ -47,12 +53,11 @@ function clearMessageDivs(state) {
         expiryDate.disabled = true;
         emailId.disabled = true;
         phnNumber.disabled = true;
+        emailChoice.disabled = true;;
+        textChoice.disabled = true;;
         postPaymentButton.disabled = true;
     }
-    
-    
 
-    
 }
 
 clearMessageDivs('load');
@@ -74,6 +79,10 @@ document.getElementById('getBalanceButton').addEventListener('click', function (
     .then((resp) => resp.json()) 
     .then(function(data) {
         console.log(data)
+        // additional logic to keep the form disabled if the there is not balance due
+        if(data.Item.Balance<=0){
+            clearMessageDivs('postnobalancedue')   
+        }
         successDiv.textContent = 'Please check your balance and make proper payment.';
         resultsDiv.textContent = JSON.stringify(data);
         invoiceID.value = data.Item.InvoiceID;
@@ -90,27 +99,38 @@ document.getElementById('postPaymentButton').addEventListener('click', function 
     // prevent page reloading by  clear message Divs
     event.preventDefault()
     clearMessageDivs('post')    
+    var choices = "both"
+    if (getEmailChoice() == '1' && getTextChoice() == '1')
+        choices = "both"
+    else if(getEmailChoice() == '1')
+        choices = "email"
+    else if(getEmailChoice() == '1')
+        choices = "text"
+    
     // Prepare the appropriate HTTP request to the API with fetch
     // update uses the /prometheon/id endpoint and requires a JSON payload
-    fetch(APIGATEWAYURL+'/id', {
+    fetch(APIGATEWAYURL+ '/paymentbalance', {
         headers:{
             "Content-type": "application/json"
         },
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify({
             'InvoiceID': getInvoiceID(),
             'BillersName': getBillersName(),
+            'BillingAmount': getBillingAmount(),
             'CardNumber': getCardNumber(),
             'ExpiryDate': getExpiryDate(),
             'EmailId': getEmailId(),
-            'PhnNumber': getPhnNumber()
+            'PhnNumber': getPhnNumber(),
+            'Choices': choices,
+            'WaitSeconds': 10
         }),
         mode: 'cors'
     })
     .then((resp) => resp.json()) 
     .then(function(data) {
         console.log(data)
-        successDiv.textContent = 'Congratulations, Your payment has been posted and an email/SMS has been sent you.';
+        successDiv.textContent = 'Congratulations, Your payment has been posted and an email/SMS as chosen by you has been sent.';
         resultsDiv.textContent = JSON.stringify(data);
 
     })
