@@ -10,7 +10,7 @@
     
     "ProcessPayment": {
       "Type" : "Task",
-      "Resource": "arn:aws:lambda:us-east-1:677236783664:function:postPayment",
+      "Resource": "ARN_OF_POSTPAYMENT_LAMBDA_FUNCTION",
       "Next": "ChoiceAlertState"
     },
     
@@ -38,13 +38,13 @@
 
     "ProcessEmails": {
       "Type" : "Task",
-      "Resource": "arn:aws:lambda:us-east-1:677236783664:function:processEmails",
+      "Resource": "ARN_OF_PROCESSEMAILS_LAMBDA_FUNCTION",
       "Next": "FinalState"
     },
 
     "ProcessTexts": {
       "Type" : "Task",
-      "Resource": "arn:aws:lambda:us-east-1:677236783664:function:processTexts",
+      "Resource": "ARN_OF_PROCESSTEXTS_LAMBDA_FUNCTION",
       "Next": "FinalState"
     },
     
@@ -56,7 +56,7 @@
           "States": {
             "ProcessEmailsParallel": {
               "Type" : "Task",
-              "Resource": "arn:aws:lambda:us-east-1:677236783664:function:processEmails",
+              "Resource": "ARN_OF_PROCESSEMAILS_LAMBDA_FUNCTION",
               "End": true
             }
           }
@@ -66,7 +66,7 @@
           "States": {
             "ProcessTextsParallel": {
               "Type" : "Task",
-              "Resource": "arn:aws:lambda:us-east-1:677236783664:function:processTexts",
+              "Resource": "ARN_OF_PROCESSTEXTS_LAMBDA_FUNCTION",
               "End": true
             }
           }
