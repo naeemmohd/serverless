@@ -425,9 +425,9 @@ API Gateway | create a managed API Gateway service to expose endpoints to getBal
     }
   ```
 - Please see the snalshot of the State engione work flow.
-  ![Create a Step function](./images/createstepfunction.png)
-  ![Details/Code of a Step function](./images/detailsofstepfunction.png)
-  ![Executions of a Step function](./images/executionsofstepfunction.png)
+  ![Create a Step function](./images/createstepfunction.PNG)
+  ![Details/Code of a Step function](./images/detailsofstepfunction.PNG)
+  ![Executions of a Step function](./images/executionsofstepfunction.PNG)
 
 #### API Gateway | create a managed API Gateway service to expose endpoints to getBalance and processPaymentFlow Lambda functions
 - The  will have a child resource ID which will execute the 'getBalance' Lambda functions and takes INvoiceID as queryString.
@@ -439,27 +439,222 @@ API Gateway | create a managed API Gateway service to expose endpoints to getBal
   - Enable CORS for cross origin resource sharing
   - Deploy the API to a stage - e.g Prod
 - Please see the snapshot below.
-  ![API Resource and Method creation for postPayment](./images/apiPostPayment.png)
-  ![API Resource and Method creation for getBalance](./images/apiGetBalance.png)
+  ![API Resource and Method creation for postPayment](./images/apiPostPayment.PNG)
+  ![API Resource and Method creation for getBalance](./images/apiGetBalance.PNG)
 
 #### DynamoDB | Once the file is getting processed keep writing and updating the data in a table
 - Create a DynamoDB table 'PaymentBalance' with Primary Key as 'InvoiceID' .
 - Please see the snapshot below.
-  ![Creating Lambda Function Snap 03](./images/dynamoDBtable.png)
+  ![Creating Lambda Function Snap 03](./images/dynamoDBtable.PNG)
 
 #### the S3 website and how the customer submits a payment
 - Please upload the contents of the website folder to a S# bucket and configure it as a website.
 - The user first enters the 'InvoiceID' to retrive the bill details
 - Once the bill details( InvoiceID, BillersName, Amount Due) are retrived the user eneters the ceredit card into ans submits the data
   - A form with valid Bill due amount
-    ![Weform with a valid payment due](./images/FormWithPaymentBalance.png)
+    ![Weform with a valid payment due](./images/FormWithPaymentBalance.PNG)
   - A form with 0 Bill due amount
-    ![Weform without a valid payment due](./images/FormWithoutPaymentBalance.png)
+    ![Weform without a valid payment due](./images/FormWithoutPaymentBalance.PNG)
   - Code snippet for the HTML page
     ```
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Payments Processor & Alerts Mgr</title>
+        <!-- CSS Files References -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/css/bootstrap.min.css">
+        <link href="main.css" rel="stylesheet">
+      </head>
+      <body>
+        <div class="container">
+          <form class="form-payments">
+            <h2 class="form-payments-heading">Payments Processor & Alerts Mgr</h2>
+            <hr>
+            <p>Enter the InvoiceID and click the Get Balance button to check your balance.</p>
+            <label for="InvoiceID" class="sr-only">InvoiceID</label>
+            <input type="email" id="InvoiceID" class="form-control" placeholder="InvoiceID">
+            <button id="getBalanceButton" class="btn btn-md btn-primary btn-block" type="submit">Get Balance</button>
+            <hr>
+            <p>Please enter payment details to post payment.</p>
+            <label for="BillingAmount" class="sr-only">Billing Amount</label>
+            <input type="input" id="BillingAmount" class="form-control" placeholder="BillingAmount">
+            <label for="BillersName" class="sr-only">Billers Name</label>
+            <input type="input" id="BillersName" class="form-control" placeholder="BillersName">
+            <label for="CardNumber" class="sr-only">Card Number</label>
+            <input type="input" id="CardNumber" class="form-control" placeholder="CardNumber">
+            <label for="ExpiryDate" class="sr-only">Expiry Date</label>
+            <input type="input" id="ExpiryDate" class="form-control" placeholder="ExpiryDate">
+            <label for="EmailId" class="sr-only">Email Id</label>
+            <input type="input" id="EmailId" class="form-control" placeholder="EmailId">
+            <input type="checkbox" id="EmailChoice" value="email">Email me<br>
+            <label for="PhnNumber" class="sr-only">Phone Number</label>
+            <input type="input" id="PhnNumber" class="form-control" placeholder="PhnNumber">
+            <input type="checkbox" id="TextChoice" value="text">Text me<br>
+            <button id="postPaymentButton" class="btn btn-md btn-primary btn-block" type="submit">Post Payment</button>
+            <hr>
+            <br>
+            <div id='error-msg'></div>
+            <div id='success-msg'></div>
+            <div id='results-msg'></div>
+          </form>
+         </div>
+        <!-- JS Files References -->
+        <script src="main.js"></script>
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.1/fetch.js"></script>
+      </body>
+    </html>
+
     ```
   - Code snippet for the JS file
     ```
+    // Please enter the actual APIGATEWAYURL from the API Gateway Screen
+    var APIGATEWAYURL = 'https://p0gtmoln90.execute-api.us-east-1.amazonaws.com/prod';
+
+    // setup divs for error, success and results
+    var divError = document.getElementById('error-msg')
+    var successDiv = document.getElementById('success-msg')
+    var resultsDiv = document.getElementById('results-msg')
+
+    var invoiceID = document.getElementById('InvoiceID')
+    var billingAmount = document.getElementById('BillingAmount')
+    var billersName = document.getElementById('BillersName')
+    var cardNumber = document.getElementById('CardNumber')
+    var expiryDate = document.getElementById('ExpiryDate')
+    var emailId = document.getElementById('EmailId')
+    var phnNumber = document.getElementById('PhnNumber')
+    var emailChoice = document.getElementById('EmailChoice')
+    var textChoice = document.getElementById('TextChoice')
+
+    var postPaymentButton = document.getElementById('postPaymentButton')
+
+    // setup functions to get the field data
+    function getInvoiceID() { return invoiceID.value }
+    function getBillingAmount() { return billingAmount.value }
+    function getBillersName() { return billersName.value }
+    function getCardNumber() { return cardNumber.value }
+    function getExpiryDate() { return expiryDate.value }
+    function getEmailId() { return emailId.value }
+    function getPhnNumber() { return phnNumber.value }
+    function getEmailChoice() { return emailChoice.value }
+    function getTextChoice() { return textChoice.value }
+
+    function clearMessageDivs(state) {
+        // clear the error, sucess and results div to refresh the content
+        divError.textContent = '';
+        resultsDiv.textContent = '';
+        successDiv.textContent = '';
+
+        invoiceID.disabled = false;
+        billersName.disabled = true;
+        billingAmount.disabled = true;
+
+        if(state == 'get'){
+            cardNumber.disabled = false;
+            expiryDate.disabled = false;
+            emailId.disabled = false;
+            phnNumber.disabled = false;
+            emailChoice.disabled = false;
+            textChoice.disabled = false;
+            postPaymentButton.disabled = false;
+        }
+        else{
+            cardNumber.disabled = true;
+            expiryDate.disabled = true;
+            emailId.disabled = true;
+            phnNumber.disabled = true;
+            emailChoice.disabled = true;;
+            textChoice.disabled = true;;
+            postPaymentButton.disabled = true;
+        }
+
+    }
+
+    clearMessageDivs('load');
+
+    // Add the click listeners for both buttons button that make the API request
+
+    document.getElementById('getBalanceButton').addEventListener('click', function (event) {
+        // prevent page reloading by  clear message Divs
+        event.preventDefault()
+        clearMessageDivs('get')
+        // Call the GET API service by Passing the InvoiceID
+        fetch(APIGATEWAYURL+ '/paymentbalance/id?InvoiceID='+getInvoiceID(), {
+            headers:{
+                "Content-type": "application/json"
+            },
+            method: 'GET',
+            mode: 'cors'
+        })
+        .then((resp) => resp.json()) 
+        .then(function(data) {
+            console.log(data)
+            if(data.Item.Balance<=0){
+                clearMessageDivs('postnobalancedue')   
+            }
+            successDiv.textContent = 'Please check your balance and make proper payment.';
+            resultsDiv.textContent = JSON.stringify(data);
+            invoiceID.value = data.Item.InvoiceID;
+            billersName.value = data.Item.CustomerName;
+            billingAmount.value = data.Item.Balance;
+        })
+        .catch(function(err) {
+            divError.textContent = 'Sorry, We could not pull your bill details:\n' + err.toString();
+            console.log(err)
+        });
+    });
+
+    document.getElementById('postPaymentButton').addEventListener('click', function (event) {
+        // prevent page reloading by  clear message Divs
+        event.preventDefault()
+        clearMessageDivs('post')    
+        var choices = "both"
+        if (getEmailChoice() == '1' && getTextChoice() == '1')
+            choices = "both"
+        else if(getEmailChoice() == '1')
+            choices = "email"
+        else if(getEmailChoice() == '1')
+            choices = "text"
+
+        // Prepare the appropriate HTTP request to the API with fetch
+        // update uses the /prometheon/id endpoint and requires a JSON payload
+        fetch(APIGATEWAYURL+ '/paymentbalance', {
+            headers:{
+                "Content-type": "application/json"
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                'InvoiceID': getInvoiceID(),
+                'BillersName': getBillersName(),
+                'BillingAmount': getBillingAmount(),
+                'CardNumber': getCardNumber(),
+                'ExpiryDate': getExpiryDate(),
+                'EmailId': getEmailId(),
+                'PhnNumber': getPhnNumber(),
+                'Choices': choices,
+                'WaitSeconds': 10
+            }),
+            mode: 'cors'
+        })
+        .then((resp) => resp.json()) 
+        .then(function(data) {
+            console.log(data)
+            successDiv.textContent = 'Congratulations, Your payment has been posted and an email/SMS as chosen by you has been sent.';
+            resultsDiv.textContent = JSON.stringify(data);
+
+        })
+        .catch(function(err) {
+            divError.textContent = 'Sorry, we could not process your payment request:\n' + err.toString();
+            console.log(err)
+        });
+    });
+
+
     ```
   - For rest of the file details please see the website folder
   
