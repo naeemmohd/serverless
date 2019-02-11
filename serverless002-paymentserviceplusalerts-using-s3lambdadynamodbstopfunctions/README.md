@@ -1,5 +1,6 @@
 # Payment processor with work flow state machine using Data using AWS S3, Lambda Functions, Step Functions and DynamoDB.
 ### This article shows how to use these AWS services - S3, Lambda Functions, Step Functions, API Gateway and DynamaDB to process a payment.
+### [Live Serverless Project Link](http://nm-payment-balance.s3-website-us-east-1.amazonaws.com/)
 ### Objective:
 - For the Billling and Payment process, a file is placed/updated in S3 everyday for customers whose Bill is due/pending and
 - Next, this Bills Due file is processed by a Lambda Function to update the information in a DynamoDB table and
