@@ -1,6 +1,5 @@
 # Processing Data using AWS S3, Lambda Functions and DynamoDB.
 ### This article shows how to use there three AWS services - S3, Lambda and DynamaDB to process structured files.
-### [Live Serverless Project Link](http://nm-payment-balance.s3-website-us-east-1.amazonaws.com/)
 
 ### The following steps would be needed to accomplish the objective:
 - First of all we will have salary data files for per month for a organisation containing Employee ID, Employee Name, Salary as the fields 
