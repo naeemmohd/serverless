@@ -1,8 +1,11 @@
 # Prerequisites: Please install the following before genarating the file.
 # install pip and dependencies
-# sudo apt-get install python-pip python-dev build-essential
+# for Python 2.x - sudo apt-get install python-pip python-dev build-essential python-setuptools
+# for Python 3.x - sudo apt-get install python3-pip python3-dev build-essential python3-setuptools
 # install names 
-# pip install names
+# for Python 2.x - pip install names
+# for Python 3.x - pip3 install names
+
 import names
 import random
 import os
