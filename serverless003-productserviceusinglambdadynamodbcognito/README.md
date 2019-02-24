@@ -1,5 +1,5 @@
 # ProductsService - 
-### The tuorial below helps to create a Producton ready serverless application AWS S3, API Gateway, Lambda Functions, CloudFront, CloudWatch, Canary,  Step Functions and DynamoDB.
+### The tutorial below helps to create a Producton ready serverless application AWS S3, API Gateway, Lambda Functions, CloudFront, CloudWatch, Canary,  Step Functions and DynamoDB.
 ### [Live Serverless ProductsService Project Link](http://nm-products-service.s3-website-us-east-1.amazonaws.com/)
 ### Features:
 - This application is a full fledged, production ready serverless application.
