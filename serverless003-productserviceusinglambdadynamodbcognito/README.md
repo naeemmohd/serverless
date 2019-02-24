@@ -41,7 +41,7 @@ Step 06  | Steps to make ProductsService Production ready
  ![Step 01 - S3 bucket with public access](./images/step01bucketwithpublicaccess.PNG)
  - Also, configure it as a static website.
  ![Step 01 - S3 bucket with configured as static website](./images/step01bucketaswebsite.PNG)
- = So now our static site will be ( dont worry, we will soon upload the files to the website) - http://nm-products-service.s3-website-us-east-1.amazonaws.com
+ - So now our static site will be ( dont worry, we will soon upload the files to the website) - http://nm-products-service.s3-website-us-east-1.amazonaws.com
  
 #### Step 02  | Setup Policies and Roles for Lambda to access S3
  - create a policy named 'PS-S3-Access-Policy' for access to S3.
