@@ -1,0 +1,4 @@
+ProductID,ProductName, ProductDescription, Price, CategoryID, SubCategoryID,PromotionID, IsActive
+1,'Tan Lipstick', 'This product is a tan shade lipstick', 45, 1, 1, 1, 1
+2,'Lemon Scrub', 'This product helps exfoliate your skin with lemon flavor', 55, 2, 3, 2, 1
+3,'Glory Miracle Special', 'This is a directors special all in one best product', 65, 3, 6, 3, 1

@@ -14,7 +14,7 @@ Steps | Actions
 ------------ | -------------
 Step 01  | Create a S3 bucket and configure it as a static website
 Step 02  | Setup Policies and Roles for Lambda to access S3
-Step 03  | Create DynamoDB to store ProductsTable
+Step 03  | Create DynamoDB to store Products data
 Step 04  | Create Lambda Functions and API Gateway to expose functionalities to creat, edit, update, delete products
 Step 05  | Setup Cognito for creating users
 Step 06  | Steps to make ProductsService Production ready
@@ -52,5 +52,190 @@ Step 06  | Steps to make ProductsService Production ready
  - Please see the screenshot below for reference:
  ![Step 02 - 'PS-S3-Access-Role' role for access to S3](./images/step02rolefors3acess.PNG)
  
- 
+#### Step 03  | Create DynamoDB to store Products data
+ - We will use a a down-graded version of a Product service
+    - Products table - stores products info
+    - Categories table - stores categories of the products
+    - SubCategories table - stores sub-categories of the products 
+    - Promotions table - stores promotions for providing discounts on the product
+    - We will use a small script to upload the table with some sample data and then we can always add/delete/update them.
+    - Lets start creating tables:
+        - Categories table - Partion Key: CategoryID, Attributes: CategoryName, IsActive
+        - SubCategories table - Partion Key: SubCategoryID, Attributes: SubCategoryName, CategoryID, IsActive 
+        - Promotions table - Partion Key: PromotionID, Attributes: PromotionName, IsActive, PromotionDiscount
+        - Products table -  Partion Key: ProductID, Attributes: ProductName, ProductDescription, Price, CategoryID, SubCategoryID,
+                            PromotionID, IsActive
+    - Please see the screenshot below for reference:
+    ![Step 03 - Creating tables in DynamoDB to store Products data](./images/step03datatables.PNG)
+    - Please use the script below to create sample categories, subcategories , promotions and products.
+    - Create a file DataFileGenerator.py and save the script below and execute the file to generate the data files)
+    ```
+    import names
+    import random
+    import os
+
+    dirName = 'logs';
+    if not os.path.exists(dirName):
+        os.mkdir(dirName)
+
+    # categories csv file
+    filePath = dirName + '/categories.csv';
+    with open(filePath, 'w+') as outfile:
+        outfile.write('CategoryID,CategoryName,IsActive\n')
+        outfile.write('1,\'Skin care\',1\n')
+        outfile.write('2,\'Make up\',1\n')
+        outfile.write('3,\'Fragnance\',1\n')
+        outfile.close()
+        print('Please check the file at path:' + os.path.abspath(filePath));
+
+    # sub categories csv file
+    filePath = dirName + '/subcategories.csv';
+    with open(filePath, 'w+') as outfile:
+        outfile.write('SubCategoryID,SubCategoryName,CategoryID,IsActive\n')
+        outfile.write('1,\'Exfoliator\',1,1\n')
+        outfile.write('2,\'Serum\',1,1\n')
+        outfile.write('3,\'Lipstick\',2,1\n')
+        outfile.write('4,\'Eye Liner\',2,1\n')
+        outfile.write('5,\'Mens\',3,1\n')
+        outfile.write('6,\'Womans\',3,1\n')
+        outfile.close()
+        print('Please check the file at path:' + os.path.abspath(filePath));  
+
+    # promotions csv file
+    filePath = dirName + '/promotions.csv';
+    with open(filePath, 'w+') as outfile:
+        outfile.write('PromotionID,PromotionName,PromotionDiscount,IsActive\n')
+        outfile.write('1,\'New Cosultant Promotions\',20,1\n')
+        outfile.write('2,\'Senior Cosultant Promotions\',30,1\n')
+        outfile.write('3,\'Director Level Promotions\',50,1\n')
+        outfile.close()
+        print('Please check the file at path:' + os.path.abspath(filePath));
+
+    # products csv file
+    filePath = dirName + '/products.csv';
+    with open(filePath, 'w+') as outfile:
+        outfile.write('ProductID,ProductName, ProductDescription, Price, CategoryID, SubCategoryID,PromotionID, IsActive\n')
+        outfile.write('1,\'Tan Lipstick\', \'This product is a tan shade lipstick\', 45, 1, 1, 1, 1\n')
+        outfile.write('2,\'Lemon Scrub\', \'This product helps exfoliate your skin with lemon flavor\', 55, 2, 3, 2, 1\n')
+        outfile.write('3,\'Glory Miracle Special\', \'This is a directors special all in one best product\', 65, 3, 6, 3, 1\n')
+        outfile.close()
+        print('Please check the file at path:' + os.path.abspath(filePath));
+    ```
+    - Now create a lambda function with a trigger to read the categories, subcategories , promotions and products files and save it into DynamoDB as test data
+    ```
+    import boto3
+    import csv 
+    import json
+
+    s3 = boto3.client('s3')
+    dynamodb = boto3.client('dynamodb')
+
+    def handler(event, context):
+    # Get the object from the event then download it to Lambda tmp space
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    print(bucket)
+    key = event['Records'][0]['s3']['object']['key']
+    print(key)
+    if '.csv' not in key:
+        return 'Not a csv file, please upload a CSV File.'
+    s3.download_file(bucket, key, '/tmp/' + key)
+    # Use DynamoDB atomic counters to sget data from csv and save to DynamoDB
+    with open('/tmp/' + key, 'r') as infile:
+        first_line = infile.readline()
+        if 'categories' in key and 'subcategories' not in key:
+            for row in infile:
+                print(row)
+                dbCategoryID = row.strip().split(',')[0]
+                dbCategoryName = row.strip().split(',')[1]
+                dbIsActive = row.strip().split(',')[2]
+                response = dynamodb.update_item(
+                        TableName='PS-Categories', 
+                        Key={
+                            'CategoryID': {'N': dbCategoryID}
+                        },
+                        UpdateExpression='set CategoryName=:categoryName, IsActive=:isActive',
+                        ExpressionAttributeValues={
+                            ':categoryName': {'S': dbCategoryName},
+                            ':isActive': {'N': dbIsActive}
+                        },
+                        ReturnValues="UPDATED_NEW"
+                )
+                print(response)
+        elif 'subcategories' in key
+            for row in infile:
+                print(row)
+                dbSubCategoryID= row.strip().split(',')[0]
+                dbSubCategoryName = row.strip().split(',')[1]
+                dbCategoryID = row.strip().split(',')[2]
+                dbIsActive = row.strip().split(',')[3]
+                response = dynamodb.update_item(
+                        TableName='PS-SubCategories', 
+                        Key={
+                            'SubCategoryID': {'N': dbSubCategoryID}
+                        },
+                        UpdateExpression='set SubCategoryName=:subCategoryName, CategoryID=:categoryID, IsActive=:isActive',
+                        ExpressionAttributeValues={
+                            ':subCategoryName': {'S': dbSubCategoryName},
+                            ':categoryID': {'N': dbCategoryID},
+                            ':isActive': {'N': dbIsActive}
+                        },
+                        ReturnValues="UPDATED_NEW"
+                )
+                print(response)
+        elif 'promotions' in key
+            for row in infile:
+                print(row)
+                dbPromotionID= row.strip().split(',')[0]
+                dbPromotionName = row.strip().split(',')[1]
+                dbPromotionDiscount = row.strip().split(',')[2]
+                dbIsActive = row.strip().split(',')[3]
+                response = dynamodb.update_item(
+                        TableName='PS-Promotions', 
+                        Key={
+                            'PromotionID': {'N': dbPromotionID}
+                        },
+                        UpdateExpression='set PromotionName=:promotionName, PromotionDiscount=:promotionDiscount, IsActive=:isActive',
+                        ExpressionAttributeValues={
+                            ':promotionName': {'S': dbPromotionName},
+                            ':promotionDiscount': {'N': dbPromotionDiscount},
+                            ':isActive': {'N': dbIsActive}
+                        },
+                        ReturnValues="UPDATED_NEW"
+                )
+                print(response)
+        elif 'products' in key
+            for row in infile:
+                print(row)
+                dbProductID= row.strip().split(',')[0]
+                dbProductName = row.strip().split(',')[1]
+                dbProductDescription = row.strip().split(',')[2]
+                dbPrice = row.strip().split(',')[3]
+                dbCategoryID = row.strip().split(',')[4]
+                dbSubCategoryID = row.strip().split(',')[5]
+                dbPromotionID = row.strip().split(',')[6]
+                dbIsActive = row.strip().split(',')[7]
+                response = dynamodb.update_item(
+                        TableName='PS-Products', 
+                        Key={
+                            'ProductID': {'N': dbProductID}
+                        },
+                        UpdateExpression='set ProductName=:productName, ProductDescription=:productDescription, Price=:price, CategoryID=:categoryID, SubCategoryID=:subCategoryID, PromotionID=:promotionID, IsActive=:isActive',
+                        ExpressionAttributeValues={
+                            ':productName': {'S': dbProductName},
+                            ':productDescription': {'S': dbProductDescription},
+                            ':price': {'N': dbPrice},
+                            ':categoryID': {'N': dbCategoryID},
+                            ':subCategoryID': {'N': dbSubCategoryID},
+                            ':promotionID': {'N': dbPromotionID},
+                            ':isActive': {'N': dbIsActive}
+                        },
+                        ReturnValues="UPDATED_NEW"
+                )
+                print(response)
+    ```
+    - Please see the screenshot below for reference for the trigger and the lambda code:
+    ![Step 03 - Lambda Function with specific Role](./images/step03lambdafunctionwithspecificrole.PNG)
+    ![Step 03 - Lambda Function with Trigger](./images/step03lambdafunctionwithtrigger.PNG)
+    ![Step 03 - Lambda Function with Code](./images/step03ambdafunctionwithcode.PNG)
+    
 ### More to follow(penning it up).
