@@ -1,4 +1,4 @@
 PromotionID,PromotionName,PromotionDiscount,IsActive
-1,'New Cosultant Promotions',20,1
-2,'Senior Cosultant Promotions',30,1
-3,'Director Level Promotions',50,1
+1,New Cosultant Promotions,20,1
+2,Senior Cosultant Promotions,30,1
+3,Director Level Promotions,50,1

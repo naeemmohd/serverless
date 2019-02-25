@@ -1,0 +1,22 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:Query",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:us-east-1:677236783664:table/PS-Categories",
+                "arn:aws:dynamodb:us-east-1:677236783664:table/PS-SubCategories",
+                "arn:aws:dynamodb:us-east-1:677236783664:table/PS-Promotions",
+                "arn:aws:dynamodb:us-east-1:677236783664:table/PS-Products"
+            ]
+        }
+    ]
+}
