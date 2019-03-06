@@ -8,6 +8,7 @@
                 "dynamodb:BatchWriteItem",
                 "dynamodb:PutItem",
                 "dynamodb:DeleteItem",
+                "dynamodb:Scan",
                 "dynamodb:Query",
                 "dynamodb:UpdateItem"
             ],

@@ -58,7 +58,10 @@ Step 03  | Create DynamoDB to store Products data
             "Action": [
                 "dynamodb:BatchWriteItem",
                 "dynamodb:PutItem",
-                "dynamodb:Query"
+                "dynamodb:DeleteItem",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:UpdateItem"
             ],
             "Resource": [
                 "arn:aws:dynamodb:us-east-1:677236783664:table/PS-Categories",
