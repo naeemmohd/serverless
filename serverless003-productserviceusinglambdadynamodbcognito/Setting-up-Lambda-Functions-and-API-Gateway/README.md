@@ -3,7 +3,7 @@
 Steps | Actions
 ------------ | -------------
 Step 01  | Setup Lambda functions
-Step 02  | Setup API gateway
+Step 02  | Setup API Gateway
 Step 03  | Advanced Configuration for Lambda functions and API gateway
 
 #### Step 01  | Setup Lambda functions
@@ -185,5 +185,23 @@ Step 03  | Advanced Configuration for Lambda functions and API gateway
 - Also create a Test Scipt to test the scan function(See file PSProductsGETTest.txt)
     - Since the Lambda function does not take any parameters, please use {} (blank JSON, for the input parameters for the test)
     - ![Step 01 - PSProductsGETTest Test](./images/PSProductsGETTest.PNG)
-    
+
+#### Step 02  | Setup API Gateway
+ - Create a new API Gateway - ***ProductServiceAPI***.
+   - ![Step 02 - Setup API Gateway](./images/Setup-API-Gateway-01.PNG)
+   
+ - Now create 4 ***resources*** under the ProductServiceAPI named categories, subcategories, promotions, products
+   - ![Step 02 - Setup API Gateway Resources - categories](./images/Setup-API-Gateway-Resources-01.PNG)
+   - ![Step 02 - Setup API Gateway Resources - subcategories](./images/Setup-API-Gateway-Resources-02.PNG)
+   - ![Step 02 - Setup API Gateway Resources - promotions](./images/Setup-API-Gateway-Resources-03.PNG)
+   - ![Step 02 - Setup API Gateway Resources - products](./images/Setup-API-Gateway-Resources-04.PNG)
+   
+- Now create ***methods*** GET,  for the resources for the ProductServiceAPI
+   - ![Step 02 - Setup API Gateway methods for resource categories](./images/Setup-API-Gateway-GETMethods-01.PNG) 
+   - ![Step 02 - Setup API Gateway methods for resource subcategories](./images/Setup-API-Gateway-GETMethods-02.PNG) 
+   - ![Step 02 - Setup API Gateway methods for resource products](./images/Setup-API-Gateway-GETMethods-03.PNG) 
+   - ![Step 02 - Setup API Gateway methods for resource products](./images/Setup-API-Gateway-GETMethods-04.PNG) 
+   
+   ```
+   ```
 ### More to follow(penning it up).
